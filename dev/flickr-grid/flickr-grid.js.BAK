@@ -1,0 +1,258 @@
+(function() {
+
+	function QS(element) {
+	    return document.querySelector(element);
+	}
+
+	function QSA(element) {
+	    return document.querySelectorAll(element);
+	}
+
+	function ID(elementID) {
+	    return document.getElementById(elementID);
+	}
+
+	var gallery = {
+	    container: null,
+	    containerPadding: 0,
+	    containerWidth: 0,
+	    itemsArray: [],
+	    itemMargin: 0,
+	    items: [], // Array of all the <img>
+	    count: [],
+	    maxWidth: 0,
+
+	    initImages: function() {
+
+	    	var style = document.createElement('style');
+	    	style.type = 'text/css';
+	    	style.innerHTML = '.gallery-item { margin-left: 10px; }';
+	    	document.getElementsByTagName('head')[0].appendChild(style);
+
+	        this.containerPadding = getValue(QS('.gallery'),'padding-left') * 2;
+	        this.containerWidth = getValue(QS('.gallery'), 'width');
+	        this.itemMargin = getValue(QS('.gallery-item'), 'margin-left') * 2;
+	        this.items = QSA('.gallery-item');
+	        this.container = QS('.gallery'); // Container of the images
+
+	        for (var i = 0; i < this.items.length; i++) {
+	            this.itemsArray.push(i);
+	            this.items[i].style.height = '';
+	            this.items[i].style.width = '';
+
+	        };
+
+
+	        this.setImages();
+	    },
+
+	    setImages: function() {
+	        this.maxWidth = 0;
+	        this.count = [];
+	        var img;
+
+	        for (var i = 0; i < this.itemsArray.length; i++) {
+	            if (this.maxWidth < (this.containerWidth - this.containerPadding * 2 - this.itemMargin * 2)) {
+
+	                img = getValue(this.items[this.itemsArray[i]], 'width');
+
+	                this.maxWidth += img;
+	                this.count.push(i);
+
+	            }
+	            // log(items[i].offsetWidth);
+
+	        };
+
+	        if (this.itemsArray.length > 0) {
+	            this.fixImages();
+
+	        }
+	    },
+
+	    fixImages: function() {
+	        var diffWidth = 0; // init diff
+	        var diffHeight = 0; // init diff
+
+	        var img;
+	        var imageWidth;
+	        var imageHeight;
+	        var firstImg;
+
+	        if (this.count.length === 1 && this.itemsArray.length === 1 && window.innerWidth > 900) {
+	            this.itemsArray.shift();
+
+	        }else {
+	            for (var i = 0; i < this.count.length; i++) {
+	                // calculates the new width
+
+	                firstImg = this.items[this.itemsArray[0]];
+
+	                imageWidth = getValue(firstImg, 'width');
+
+	                //get porpotions
+
+	                var prop = firstImg.naturalHeight / firstImg.naturalWidth;
+
+	                imageHeight = imageWidth * prop;
+
+	                diffWidth = imageWidth * (this.containerWidth / this.maxWidth);
+	                diffHeight = imageHeight * (this.containerWidth / this.maxWidth);
+
+	                firstImg.style.width = diffWidth - (this.containerPadding / this.count.length) - this.itemMargin + 'px';
+	                firstImg.style.height = diffHeight - this.itemMargin + 'px';
+
+	                this.itemsArray.shift();
+
+	            };
+
+	        };
+
+	        if (this.itemsArray.length > 0) {
+	            this.setImages();
+
+	        }else {
+	            console.log('finished');
+	            // ID('loadingMessage').style.display = 'none';
+	            var allImages = QSA('.gallery-item');
+
+	            for (var i = 0; i < allImages.length; i++) {
+	                allImages[i].style.opacity = '1';
+
+	            };
+
+	        }
+	    }
+
+	}; // end of gallery object
+
+	/////////////////////////////////
+	/*         Flickr API          */
+	/////////////////////////////////
+
+	/*
+	*   o for original,
+	*   b for a width/height of 1024,
+	*   m for 240,
+	*   t for 100,
+	*   s for 75.
+	*   When not specified it defaults to a width/height of 500.
+	*
+	*   _t.jpg
+	*/
+
+	var waitForFinalEvent = (function () {
+	  var timers = {};
+	  return function (callback, ms, uniqueId) {
+	    if (!uniqueId) {
+	      uniqueId = "Don't call this twice without a uniqueId";
+	    }
+	    if (timers[uniqueId]) {
+	      clearTimeout (timers[uniqueId]);
+	    }
+	    timers[uniqueId] = setTimeout(callback, ms);
+	  };
+	})();
+
+	function ajaxGET(url, callback) {
+	    var XHR = null;
+
+	    if (XMLHttpRequest) {
+	        XHR = new XMLHttpRequest();
+
+	    } else {
+	        XHR = new ActiveXObject('Microsoft.XMLHTTP');
+
+	    }
+
+	    XHR.onreadystatechange = function() {
+	        if (XHR.readyState === 4 || XHR.readyState === 'complete') {
+	            if (XHR.status === 200) {
+	                callback(XHR);
+
+	            } else {
+	                alert('fel på servern');
+
+	            }
+
+	        }
+	    };
+
+	    XHR.open('GET', url, true);
+	    XHR.send(null);
+	}
+
+	function getValue(elem, value) {
+	    var newValue = getComputedStyle(elem, null).getPropertyValue(value);
+
+	    return parseFloat(newValue.substring(0, newValue.length - 2));
+	}
+
+	function setCSS(selector, obj) {
+
+	    if (typeof selector === 'string') {
+	        var elem = document.querySelectorAll(selector);
+
+	        for (var i = 0; i < elem.length; i++) {
+	        	for (let key in obj) {
+	        	    if (obj.hasOwnProperty(key)) {
+	        	        elem[i].style[key] = obj[key];
+	        	    }
+	        	}
+	        }
+
+
+	    } else if (selector instanceof HTMLElement) {
+	        for (let key in obj) {
+	            if (obj.hasOwnProperty(key)) {
+	                selector.style[key] = obj[key];
+
+	            }
+	        }
+	    }
+	}
+
+	function createGallery(url) {
+	    var img = document.createElement('img');
+
+	    img.src = url;
+	    img.className = 'gallery-item';
+	    QS('.gallery').appendChild(img);
+	}
+
+	function cbFlickr(data) {
+	    var p_url = '';
+	    var t_url = '';
+	    var photo;
+	    var data = JSON.parse(data.responseText);
+	    // log(photos);
+	    for (var i = 0; i < 15; i++) {
+	        photo = data.photos.photo[i];
+	        p_url = 'http://www.flickr.com/photos/' + photo.owner + '/' + photo.id;
+	        t_url = 'http://farm' + photo.farm + '.static.flickr.com/' + photo.server + '/' + photo.id + '_' + photo.secret + '.jpg';
+	        createGallery(t_url);
+
+	    }
+	    // gallery.initImages();
+	    setTimeout(function() {
+	        gallery.initImages();
+	    }, 1000);
+	}
+
+
+
+	if (QS('.gallery')) {
+
+	    ajaxGET('https://www.flickr.com/services/rest/?&method=flickr.people.getPublicPhotos&format=json&api_key=4d6d6af841af2bba2737c158bd2cc298&user_id=113967346@N06&nojsoncallback=1', cbFlickr);
+
+	    window.addEventListener('resize', function(event) {
+	    	var id = String(new Date().getTime());
+	        waitForFinalEvent(function() {
+	            gallery.initImages();
+	            //...
+	        }, 500, id);
+	    }, false);
+
+	}
+
+})();
