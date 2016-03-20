@@ -293,8 +293,7 @@ var flickr = (function() {
 })();
 
 flickr.init({
-	url: 'https://www.flickr.com/services/rest/?&method=flickr.people.getPublicPhotos&format=json&api_key=4d6d6af841af2bba2737c158bd2cc298&user_id=113967346@N06&nojsoncallback=1',
-	quality: 2
+	url: 'https://www.flickr.com/services/rest/?&method=flickr.people.getPublicPhotos&format=json&api_key=4d6d6af841af2bba2737c158bd2cc298&user_id=113967346@N06&nojsoncallback=1'
 });
 
 setTimeout(function() {
