@@ -28,7 +28,7 @@ gulp.task('styles:sandbox', () => {
 });
 
 gulp.task('styles:watch', () => {
-  return gulp.src(DEV_DIR+'/flickr grid/**/*.scss')
+  return gulp.src(DEV_DIR+'/flickr-grid/**/*.scss')
     .pipe($.plumber())
     .pipe($.sourcemaps.init())
     .pipe($.sass.sync({
@@ -38,12 +38,12 @@ gulp.task('styles:watch', () => {
     }).on('error', $.sass.logError))
     .pipe($.autoprefixer({browsers: ['> 1%', 'last 2 versions', 'Firefox ESR']}))
     .pipe($.sourcemaps.write())
-    .pipe(gulp.dest(DEV_DIR+'/flickr grid'))
+    .pipe(gulp.dest(DEV_DIR+'/flickr-grid'))
     .pipe(reload({stream: true}));
 });
 
 gulp.task('styles:dist', () => {
-  return gulp.src(DEV_DIR+'/flickr grid/**/*.scss')
+  return gulp.src(DEV_DIR+'/flickr-grid/**/*.scss')
     .pipe($.plumber())
     .pipe($.sourcemaps.init())
     .pipe($.sass.sync({
@@ -52,8 +52,7 @@ gulp.task('styles:dist', () => {
       includePaths: ['.']
     }).on('error', $.sass.logError))
     .pipe($.autoprefixer({browsers: ['> 1%', 'last 2 versions', 'Firefox ESR']}))
-    .pipe($.sourcemaps.write())
-    .pipe(gulp.dest(DIST_DIR+'/flickr grid'))
+    .pipe(gulp.dest(DIST_DIR+'/flickr-grid'))
     .pipe(reload({stream: true}));
 });
 
@@ -68,30 +67,29 @@ gulp.task('scripts:sandbox', () => {
 });
 
 gulp.task('scripts:watch', () => {
-  return gulp.src(DEV_DIR+'/flickr grid/**/*.babel.js')
+  return gulp.src(DEV_DIR+'/flickr-grid/**/*.babel.js')
     .pipe($.rename({
-      basename: "flickr grid",
+      basename: "flickr-grid",
       extname: ".js"
     }))
     .pipe($.plumber())
     .pipe($.sourcemaps.init())
     .pipe($.babel())
     .pipe($.sourcemaps.write('.'))
-    .pipe(gulp.dest('.tmp/flickr grid'))
+    .pipe(gulp.dest('.tmp/flickr-grid'))
     .pipe(reload({stream: true}));
 });
 
 gulp.task('scripts:dist', () => {
-  return gulp.src(DEV_DIR+'/flickr grid/**/*.babel.js')
+  return gulp.src(DEV_DIR+'/flickr-grid/**/*.babel.js')
     .pipe($.rename({
-      basename: "flickr grid",
+      basename: "flickr-grid",
       extname: ".js"
     }))
     .pipe($.plumber())
-    .pipe($.sourcemaps.init())
     .pipe($.babel())
     .pipe($.sourcemaps.write('.'))
-    .pipe(gulp.dest(DIST_DIR+'/flickr grid'))
+    .pipe(gulp.dest(DIST_DIR+'/flickr-grid'))
     .pipe(reload({stream: true}));
 });
 
@@ -115,12 +113,12 @@ gulp.task('lint:test', lint('test/spec/**/*.js', testLintOptions));
 
 
 gulp.task('move', ['styles:dist', 'scripts:dist'], () => {
-  return gulp.src(DEV_DIR+'/flickr grid/*.js')
-    .pipe($.useref({searchPath: [DEV_DIR + '/flickr grid']}))
+  return gulp.src(DEV_DIR+'/flickr-grid/*.js')
+    .pipe($.useref({searchPath: [DEV_DIR + '/flickr-grid']}))
     .pipe($.if('*.js', $.uglify()))
     .pipe($.if('*.css', $.cssnano()))
     .pipe($.if('*.html', $.htmlmin({collapseWhitespace: true})))
-    .pipe(gulp.dest(DIST_DIR+'/flickr grid'));
+    .pipe(gulp.dest(DIST_DIR+'/flickr-grid'));
 });
 
 gulp.task('images', () => {
@@ -203,7 +201,7 @@ gulp.task('serve:test', ['scripts'], () => {
 });
 
 
-gulp.task('build', ['lint', 'move', 'images', 'extras'], () => {
+gulp.task('build', ['lint', 'move', 'images'], () => {
   return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
 });
 
