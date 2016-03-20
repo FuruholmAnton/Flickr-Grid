@@ -167,10 +167,10 @@ gulp.task('serve', ['styles:sandbox', 'scripts:sandbox', 'styles:watch', 'script
     DEV_DIR+'/images/**/*'
   ]).on('change', reload);
 
-  gulp.watch(DEV_DIR+'/flickr grid/**/*.scss', ['styles:watch']);
+  gulp.watch(DEV_DIR+'/flickr-grid/**/*.scss', ['styles:watch']);
   gulp.watch(DEV_DIR+'*.scss', ['styles:sandbox']);
   gulp.watch(DEV_DIR+'/*.js', ['scripts:sandbox']);
-  gulp.watch(DEV_DIR+'/flickr grid/**/*.js', ['scripts:watch']);
+  gulp.watch(DEV_DIR+'/flickr-grid/**/*.js', ['scripts:watch']);
 });
 
 gulp.task('serve:dist', () => {
